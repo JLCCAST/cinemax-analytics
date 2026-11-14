@@ -5,8 +5,11 @@ description = "Warehouse, dashboard y agente de text-to-SQL sobre los datos de C
 authors = [{ name = "JLCCAST" }]
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "bcrypt>=5.0.0",
     "dbt-core>=1.12.7",
     "dbt-postgres>=1.11.0",
+    "faker>=40.54.0",
+    "numpy>=2.5.4",
     "psycopg[binary]>=3.3.9",
     "pymongo>=4.20.0",
     "pymysql>=1.2.4",
