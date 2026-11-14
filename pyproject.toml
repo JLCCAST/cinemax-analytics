@@ -1,0 +1,31 @@
+[project]
+name = "cinemax-analytics"
+version = "0.1.0"
+description = "Warehouse, dashboard y agente de text-to-SQL sobre los datos de CineMax"
+authors = [{ name = "JLCCAST" }]
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "dbt-core>=1.12.7",
+    "dbt-postgres>=1.11.0",
+    "psycopg[binary]>=3.3.9",
+    "pymongo>=4.20.0",
+    "pymysql>=1.2.4",
+    "python-dotenv>=1.2.4",
+]
+
+[build-system]
+requires = ["uv_build>=0.13.8,<0.14.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+    "ruff>=0.17.5",
+]
+
+[tool.ruff]
+line-length = 100
+extend-exclude = ["cinemax"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

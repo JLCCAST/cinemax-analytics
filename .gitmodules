@@ -1,0 +1,4 @@
+[submodule "cinemax"]
+	path = cinemax
+	url = https://github.com/JLCCAST/CineMax.git
+	shallow = true

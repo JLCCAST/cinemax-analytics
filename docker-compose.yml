@@ -1,0 +1,178 @@
+name: cinemax-analytics
+
+# Las 5 bases de CineMax, sin sus servicios, más el warehouse.
+# El esquema y los datos semilla salen del código de CineMax (CINEMAX_REPO):
+# las migraciones de Flyway y el init-script de MongoDB, montados en solo lectura.
+# Los puertos son distintos a los del stack de CineMax para que los dos convivan.
+
+x-flyway: &flyway
+  image: flyway/flyway:10.20.1
+  command: migrate
+  restart: "no"
+
+services:
+
+  usuarios:
+    image: postgres:16.15
+    ports:
+      - "127.0.0.1:${PUERTO_USUARIOS:-15433}:5432"
+    environment:
+      POSTGRES_USER: ${FUENTES_USER:?falta FUENTES_USER en .env}
+      POSTGRES_PASSWORD: ${FUENTES_PASSWORD:?falta FUENTES_PASSWORD en .env}
+      POSTGRES_DB: usuarios_db
+    volumes:
+      - usuarios:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  facturacion:
+    image: postgres:16.15
+    ports:
+      - "127.0.0.1:${PUERTO_FACTURACION:-15434}:5432"
+    environment:
+      POSTGRES_USER: ${FUENTES_USER}
+      POSTGRES_PASSWORD: ${FUENTES_PASSWORD}
+      POSTGRES_DB: sales_db
+    volumes:
+      - facturacion:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  sucursales:
+    image: mysql:8.4.13
+    ports:
+      - "127.0.0.1:${PUERTO_SUCURSALES:-13307}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${FUENTES_PASSWORD}
+      MYSQL_USER: ${FUENTES_USER}
+      MYSQL_PASSWORD: ${FUENTES_PASSWORD}
+      MYSQL_DATABASE: sucursales_db
+    volumes:
+      - sucursales:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+      start_period: 40s
+
+  confiteria:
+    image: mysql:8.4.13
+    ports:
+      - "127.0.0.1:${PUERTO_CONFITERIA:-13308}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${FUENTES_PASSWORD}
+      MYSQL_USER: ${FUENTES_USER}
+      MYSQL_PASSWORD: ${FUENTES_PASSWORD}
+      MYSQL_DATABASE: confiteria_db
+    volumes:
+      - confiteria:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+      start_period: 40s
+
+  cartelera:
+    image: mongo:7.0.45
+    ports:
+      - "127.0.0.1:${PUERTO_CARTELERA:-27018}:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${FUENTES_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${FUENTES_PASSWORD}
+    volumes:
+      - cartelera:/data/db
+      - ${CINEMAX_REPO:-./cinemax}/microservices/init-scripts/mongodb-cartelera:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok' localhost:27017/test"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  flyway-usuarios:
+    <<: *flyway
+    environment:
+      FLYWAY_URL: jdbc:postgresql://usuarios:5432/usuarios_db
+      FLYWAY_USER: ${FUENTES_USER}
+      FLYWAY_PASSWORD: ${FUENTES_PASSWORD}
+      FLYWAY_CONNECT_RETRIES: 10
+    volumes:
+      - ${CINEMAX_REPO:-./cinemax}/microservices/usuarios-service/src/main/resources/db/migration:/flyway/sql:ro
+    depends_on:
+      usuarios:
+        condition: service_healthy
+
+  flyway-facturacion:
+    <<: *flyway
+    environment:
+      FLYWAY_URL: jdbc:postgresql://facturacion:5432/sales_db
+      FLYWAY_USER: ${FUENTES_USER}
+      FLYWAY_PASSWORD: ${FUENTES_PASSWORD}
+      FLYWAY_CONNECT_RETRIES: 10
+    volumes:
+      - ${CINEMAX_REPO:-./cinemax}/microservices/facturacion-service/src/main/resources/db/migration:/flyway/sql:ro
+    depends_on:
+      facturacion:
+        condition: service_healthy
+
+  flyway-sucursales:
+    <<: *flyway
+    environment:
+      FLYWAY_URL: jdbc:mysql://sucursales:3306/sucursales_db?allowPublicKeyRetrieval=true&useSSL=false
+      FLYWAY_USER: ${FUENTES_USER}
+      FLYWAY_PASSWORD: ${FUENTES_PASSWORD}
+      FLYWAY_CONNECT_RETRIES: 10
+    volumes:
+      - ${CINEMAX_REPO:-./cinemax}/microservices/sucursales-service/src/main/resources/db/migration:/flyway/sql:ro
+    depends_on:
+      sucursales:
+        condition: service_healthy
+
+  flyway-confiteria:
+    <<: *flyway
+    environment:
+      FLYWAY_URL: jdbc:mysql://confiteria:3306/confiteria_db?allowPublicKeyRetrieval=true&useSSL=false
+      FLYWAY_USER: ${FUENTES_USER}
+      FLYWAY_PASSWORD: ${FUENTES_PASSWORD}
+      FLYWAY_CONNECT_RETRIES: 10
+    volumes:
+      - ${CINEMAX_REPO:-./cinemax}/microservices/confiteria-service/src/main/resources/db/migration:/flyway/sql:ro
+    depends_on:
+      confiteria:
+        condition: service_healthy
+
+  dwh:
+    image: postgres:16.15
+    ports:
+      - "127.0.0.1:${PUERTO_DWH:-5440}:5432"
+    environment:
+      POSTGRES_USER: ${DWH_USER:?falta DWH_USER en .env}
+      POSTGRES_PASSWORD: ${DWH_PASSWORD:?falta DWH_PASSWORD en .env}
+      POSTGRES_DB: ${DWH_DB:-cinemax_dwh}
+    volumes:
+      - dwh:/var/lib/postgresql/data
+      - ./docker/dwh:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  usuarios:
+  facturacion:
+  sucursales:
+  confiteria:
+  cartelera:
+  dwh:
