@@ -102,72 +102,62 @@ PRODUCTOS_NUEVOS = (
 )
 
 CATALOGO_PELICULAS = (
-    ("El Último Faro del Sur", "Valeria Montesinos", ("Drama", "Aventura"), "PG-13"),
-    (
-        "Guardianes del Bosque Nublado",
-        "Mateo Santisteban",
-        ("Animación", "Aventura", "Comedia"),
-        "APT",
-    ),
-    ("Crónicas de Titán", "Alejandro Vera", ("Ciencia Ficción", "Acción"), "PG-13"),
-    ("La Sombra en el Espejo", "Lucía Peñaranda", ("Terror", "Drama"), "PG-18"),
-    ("Amor en Tiempos de Lluvia", "Camila Orbegoso", ("Romance", "Comedia"), "APT"),
-    ("Operación Cordillera", "Ricardo Zambrano", ("Acción", "Aventura"), "PG-13"),
-    ("El Misterio de la Huaca Perdida", "Fernando Belaunde", ("Aventura", "Comedia"), "APT"),
-    ("Pequeños Inventores", "Sofía Castañeda", ("Animación", "Comedia"), "APT"),
-    ("Susurros en la Niebla", "Héctor Villarán", ("Terror",), "PG-18"),
-    ("Horizonte Cuántico", "Daniela Aramburú", ("Ciencia Ficción", "Drama"), "PG-13"),
-    ("Dos Destinos y un Café", "Mariana Olaechea", ("Romance", "Drama"), "PG-13"),
-    ("El Vuelo del Cóndor Dorado", "Sebastián Lizarzaburu", ("Animación", "Aventura"), "APT"),
-    ("Fuga a Medianoche", "Gonzalo Seminario", ("Acción", "Drama"), "PG-13"),
-    ("Vacaciones en Enredos", "Patricia Rospigliosi", ("Comedia",), "APT"),
-    ("La Casa de los Siete Candados", "Esteban Benavides", ("Terror", "Aventura"), "PG-18"),
-    ("Estación Artemisa", "Rodrigo Alzamora", ("Ciencia Ficción", "Aventura"), "PG-13"),
-    ("Cartas desde el Altiplano", "Jimena Chocano", ("Drama", "Romance"), "APT"),
-    ("Aventura en el Arrecife", "Diego Garrido", ("Animación", "Comedia", "Aventura"), "APT"),
-    ("Código Fantasma", "Álvaro Diez Canseco", ("Acción", "Ciencia Ficción"), "PG-13"),
-    ("Un Vecino Imposible", "Claudia Berckemeyer", ("Comedia",), "APT"),
-    ("El Ritual del Eclipse", "Martín Polar", ("Terror",), "PG-18"),
-    ("Más Allá de las Dunas", "Adriana Tudela", ("Aventura", "Drama"), "PG-13"),
-    ("Robotito y la Estrella Fugaz", "Nicolás Bentín", ("Animación", "Ciencia Ficción"), "APT"),
-    ("Promesas de Invierno", "Renata Miró Quesada", ("Romance", "Drama"), "PG-13"),
-    ("Impacto Vertical", "Jorge Luis Cáceres", ("Acción",), "PG-13"),
-    ("La Banda del Barrio", "Paola Ferrand", ("Comedia", "Romance"), "APT"),
-    ("El Huésped del Piso Trece", "César Augusto Ríos", ("Terror", "Drama"), "PG-18"),
-    ("Viajeros del Reloj Solar", "Gabriel Wiese", ("Animación", "Aventura"), "APT"),
-    ("Memoria Artificial", "Ximena de la Puente", ("Ciencia Ficción", "Drama"), "PG-13"),
-    ("Caminos Cruzados", "Andrés Gallagher", ("Drama",), "PG-13"),
-    ("Rescate en la Selva Alta", "Julio César Delgado", ("Acción", "Aventura"), "PG-13"),
-    ("Boda por Accidente", "Lorena Fernandini", ("Comedia", "Romance"), "APT"),
-    ("Los Ojos del Abismo", "Víctor Raúl Tapia", ("Terror", "Ciencia Ficción"), "PG-18"),
-    ("El Reino de las Nubes", "Natalia Beingolea", ("Animación", "Comedia"), "APT"),
-    ("Sin Retorno", "Mauricio Carrillo", ("Acción", "Drama"), "PG-18"),
-    ("El Secreto del Abuelo", "Beatriz Lavalle", ("Comedia", "Drama"), "APT"),
-    ("Órbita Lejana", "Arturo Zevallos", ("Ciencia Ficción",), "PG-13"),
-    ("Noche de San Juan", "Verónica Cisneros", ("Romance", "Comedia"), "PG-13"),
-    ("Patrulla Galáctica", "Joaquín Ugarte", ("Animación", "Acción", "Ciencia Ficción"), "APT"),
-    ("Voces en el Sótano", "Hernán Bustamante", ("Terror",), "PG-18"),
-    ("La Ruta de la Plata", "Enrique Pardo", ("Aventura", "Acción"), "PG-13"),
-    ("Tres Hermanos y un Perro", "Carolina Mujica", ("Comedia",), "APT"),
-    ("El Último Tren a Huancayo", "Raúl Porras", ("Drama", "Romance"), "PG-13"),
-    ("Dinoaventuras en el Valle", "Mónica Blume", ("Animación", "Aventura", "Comedia"), "APT"),
-    ("Protocolo Centinela", "Óscar Avilés", ("Acción", "Ciencia Ficción"), "PG-13"),
-    ("El Hechizo de la Laguna", "Silvia Málaga", ("Terror", "Drama"), "PG-13"),
-    ("Verano en Paracas", "Javier Prado", ("Romance", "Comedia"), "APT"),
-    ("Cazadores de Tormentas", "Luis Alberto Sánchez", ("Acción", "Aventura"), "PG-13"),
-    ("La Escuela de Magia Andina", "Inés Temple", ("Animación", "Aventura"), "APT"),
-    ("Despertar en Marte", "Pedro Pablo Cornejo", ("Ciencia Ficción", "Aventura"), "PG-13"),
-    ("Culpables de Nada", "Elena Kcomt", ("Comedia", "Acción"), "PG-13"),
-    ("El Silencio de las Montañas", "Gustavo Mohme", ("Drama",), "PG-13"),
-    (
-        "El Tesoro del Pirata Pacífico",
-        "Alfonso Grados",
-        ("Animación", "Aventura", "Comedia"),
-        "APT",
-    ),
-    ("Reflejos Nocturnos", "Cecilia Barraza", ("Terror", "Drama"), "PG-18"),
-    ("Un Segundo Para Siempre", "Federico Salazar", ("Romance", "Drama"), "PG-13"),
-    ("Asalto al Convoy", "Humberto Martínez", ("Acción",), "PG-18"),
+    ("El Último Faro del Sur", ("Drama", "Aventura"), "PG-13"),
+    ("Guardianes del Bosque Nublado", ("Animación", "Aventura", "Comedia"), "APT"),
+    ("Crónicas de Titán", ("Ciencia Ficción", "Acción"), "PG-13"),
+    ("La Sombra en el Espejo", ("Terror", "Drama"), "PG-18"),
+    ("Amor en Tiempos de Lluvia", ("Romance", "Comedia"), "APT"),
+    ("Operación Cordillera", ("Acción", "Aventura"), "PG-13"),
+    ("El Misterio de la Huaca Perdida", ("Aventura", "Comedia"), "APT"),
+    ("Pequeños Inventores", ("Animación", "Comedia"), "APT"),
+    ("Susurros en la Niebla", ("Terror",), "PG-18"),
+    ("Horizonte Cuántico", ("Ciencia Ficción", "Drama"), "PG-13"),
+    ("Dos Destinos y un Café", ("Romance", "Drama"), "PG-13"),
+    ("El Vuelo del Cóndor Dorado", ("Animación", "Aventura"), "APT"),
+    ("Fuga a Medianoche", ("Acción", "Drama"), "PG-13"),
+    ("Vacaciones en Enredos", ("Comedia",), "APT"),
+    ("La Casa de los Siete Candados", ("Terror", "Aventura"), "PG-18"),
+    ("Estación Artemisa", ("Ciencia Ficción", "Aventura"), "PG-13"),
+    ("Cartas desde el Altiplano", ("Drama", "Romance"), "APT"),
+    ("Aventura en el Arrecife", ("Animación", "Comedia", "Aventura"), "APT"),
+    ("Código Fantasma", ("Acción", "Ciencia Ficción"), "PG-13"),
+    ("Un Vecino Imposible", ("Comedia",), "APT"),
+    ("El Ritual del Eclipse", ("Terror",), "PG-18"),
+    ("Más Allá de las Dunas", ("Aventura", "Drama"), "PG-13"),
+    ("Robotito y la Estrella Fugaz", ("Animación", "Ciencia Ficción"), "APT"),
+    ("Promesas de Invierno", ("Romance", "Drama"), "PG-13"),
+    ("Impacto Vertical", ("Acción",), "PG-13"),
+    ("La Banda del Barrio", ("Comedia", "Romance"), "APT"),
+    ("El Huésped del Piso Trece", ("Terror", "Drama"), "PG-18"),
+    ("Viajeros del Reloj Solar", ("Animación", "Aventura"), "APT"),
+    ("Memoria Artificial", ("Ciencia Ficción", "Drama"), "PG-13"),
+    ("Caminos Cruzados en Chachapoyas", ("Drama",), "PG-13"),
+    ("Rescate en la Selva Alta", ("Acción", "Aventura"), "PG-13"),
+    ("Boda por Accidente", ("Comedia", "Romance"), "APT"),
+    ("Los Ojos del Abismo", ("Terror", "Ciencia Ficción"), "PG-18"),
+    ("El Reino de las Nubes", ("Animación", "Comedia"), "APT"),
+    ("Sin Retorno a Casma", ("Acción", "Drama"), "PG-18"),
+    ("El Secreto del Abuelo", ("Comedia", "Drama"), "APT"),
+    ("Órbita Lejana", ("Ciencia Ficción",), "PG-13"),
+    ("Una Noche de San Juan en Iquitos", ("Romance", "Comedia"), "PG-13"),
+    ("Patrulla Galáctica", ("Animación", "Acción", "Ciencia Ficción"), "APT"),
+    ("Voces en el Sótano", ("Terror",), "PG-18"),
+    ("La Ruta de la Plata", ("Aventura", "Acción"), "PG-13"),
+    ("Tres Hermanos y un Perro", ("Comedia",), "APT"),
+    ("El Último Tren a Huancayo", ("Drama", "Romance"), "PG-13"),
+    ("Dinoaventuras en el Valle", ("Animación", "Aventura", "Comedia"), "APT"),
+    ("Protocolo Centinela", ("Acción", "Ciencia Ficción"), "PG-13"),
+    ("El Hechizo de la Laguna", ("Terror", "Drama"), "PG-13"),
+    ("Verano en Paracas", ("Romance", "Comedia"), "APT"),
+    ("Cazadores de Tormentas", ("Acción", "Aventura"), "PG-13"),
+    ("La Escuela de Magia Andina", ("Animación", "Aventura"), "APT"),
+    ("Despertar en Marte", ("Ciencia Ficción", "Aventura"), "PG-13"),
+    ("Culpables de Nada", ("Comedia", "Acción"), "PG-13"),
+    ("El Silencio de las Montañas", ("Drama",), "PG-13"),
+    ("El Tesoro del Pirata Pacífico", ("Animación", "Aventura", "Comedia"), "APT"),
+    ("Reflejos Nocturnos", ("Terror", "Drama"), "PG-18"),
+    ("Un Segundo Para Siempre", ("Romance", "Drama"), "PG-13"),
+    ("Asalto al Convoy", ("Acción",), "PG-18"),
 )
 
 SINOPSIS_PLANTILLAS = (
@@ -400,6 +390,7 @@ def _generar_peliculas(
     desde: date,
     hasta: date,
     rng: np.random.Generator,
+    faker: Faker,
 ) -> list[PeliculaPlan]:
     total = min(parametros.total_peliculas_nuevas, len(CATALOGO_PELICULAS))
     inicio_estrenos = _primer_jueves(desde - timedelta(days=35))
@@ -416,20 +407,17 @@ def _generar_peliculas(
         inicio_estrenos -= timedelta(days=7)
         jueves_disponibles.insert(0, inicio_estrenos)
 
-    # Asignamos 1 o 2 estrenos por jueves para cubrir el total de películas
-    fechas_estreno: list[date] = []
-    idx_jueves = 0
-    while len(fechas_estreno) < total:
-        jueves = jueves_disponibles[idx_jueves % len(jueves_disponibles)]
-        fechas_estreno.append(jueves)
-        idx_jueves += 1
-    fechas_estreno.sort()
+    # Los estrenos se reparten parejo en todos los jueves, hasta el final de la ventana:
+    # si se acaban antes, la cartelera de los últimos meses se queda sin películas nuevas.
+    posiciones = np.linspace(0, len(jueves_disponibles) - 1, total)
+    fechas_estreno = [jueves_disponibles[int(p + 0.5)] for p in posiciones]
 
     peliculas: list[PeliculaPlan] = []
     for i in range(total):
-        titulo, director, nombres_generos, nombre_clasif = CATALOGO_PELICULAS[i]
+        titulo, nombres_generos, nombre_clasif = CATALOGO_PELICULAS[i]
         if titulo in semilla.titulos_peliculas_seed:
             titulo = f"{titulo} II"
+        director = f"{faker.first_name()} {faker.last_name()}"
 
         estreno = fechas_estreno[i]
         dias_antes = int(rng.integers(14, 43))
@@ -612,7 +600,12 @@ def generar_catalogo(
     rng_peliculas, rng_clientes = rng.spawn(2)
     sedes, salas, butacas = _generar_sedes_y_salas(semilla, desde, hasta)
     productos, stocks_nuevos = _generar_confiteria(semilla, sedes, desde, hasta)
-    peliculas = _generar_peliculas(semilla, parametros, desde, hasta, rng_peliculas)
+    # Directores inventados: nombres sueltos de Faker, no de personas conocidas.
+    faker_directores = Faker("es_ES")
+    faker_directores.seed_instance(semilla_int + 1)
+    peliculas = _generar_peliculas(
+        semilla, parametros, desde, hasta, rng_peliculas, faker_directores
+    )
     clientes = _generar_clientes(semilla, parametros, desde, hasta, semilla_int, rng_clientes)
     return CatalogoPlan(
         sedes=sedes,

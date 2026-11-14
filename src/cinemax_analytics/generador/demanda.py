@@ -538,36 +538,6 @@ def generar_demanda(
         )
         orden_seq += 1
 
-    # Garantizar al menos 1 venta cada día de [desde, hasta]
-    dias_con_venta = {p.momento_lima.date() for p in preliminares}
-    for offset in range(dias_ventana):
-        dia_revision = desde + timedelta(days=offset)
-        if dia_revision not in dias_con_venta:
-            sede = catalogo.sedes[0]
-            momento_lima = datetime.combine(dia_revision, time(15, 30, 0))
-            instante_utc = momento_lima + timedelta(hours=5)
-            snacks_info = _sortear_snacks(0, dia_revision, combos, otros_snacks, parametros, rng)
-            cliente = selector_clientes.elegir(dia_revision, dia_revision, rng)
-            preliminares.append(
-                _VentaPreliminar(
-                    instante_utc=instante_utc,
-                    momento_lima=momento_lima,
-                    orden=orden_seq,
-                    cliente=cliente,
-                    funcion=None,
-                    pelicula=None,
-                    sala=None,
-                    id_venue=sede.id_venue,
-                    venue_name=sede.name_venue,
-                    entradas_info=[],
-                    snacks_info=snacks_info,
-                    metodo_pago="YAPE",
-                    intento_cupon=False,
-                    qr=codigo_qr(rng),
-                )
-            )
-            orden_seq += 1
-
     # Ordenar cronológicamente para evaluar promociones y asignar IDs
     preliminares.sort(key=lambda p: (p.instante_utc, p.orden))
 
