@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: cartelera
+    schema: raw
+    description: cartelera_db (MongoDB) de cartelera-service. Cada documento en la columna doc (JSONB).
+    tables:
+      - name: movies
+        identifier: cartelera__movies
+      - name: showtimes
+        identifier: cartelera__showtimes
+      - name: genres
+        identifier: cartelera__genres
+      - name: classifications
+        identifier: cartelera__classifications

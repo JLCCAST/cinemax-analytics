@@ -1,0 +1,32 @@
+name: cinemax_analytics
+version: "0.1.0"
+config-version: 2
+profile: cinemax_analytics
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+target-path: target
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  dim_fecha_desde: "2025-01-01"
+  dim_fecha_hasta: "2027-12-31"
+
+models:
+  cinemax_analytics:
+    staging:
+      +schema: staging
+      +materialized: view
+    marts:
+      +schema: marts
+      +materialized: table
+      # Las descripciones quedan como COMMENT ON en la base: el agente las lee.
+      +persist_docs:
+        relation: true
+        columns: true
+
+seeds:
+  cinemax_analytics:
+    +schema: staging

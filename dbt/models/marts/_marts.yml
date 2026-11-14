@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: dim_fecha
+    description: Calendario con feriados de Perú y temporadas. Sirve como fecha de venta y como fecha de función.
+    columns:
+      - name: fecha_key
+        description: Fecha como número AAAAMMDD.
+        data_tests: [unique, not_null]
+      - name: fecha
+        data_tests: [unique, not_null]
+      - name: anio_mes
+        description: Año y mes como texto AAAA-MM.
+      - name: semana_iso
+        description: Número de semana ISO (la semana empieza el lunes).
+      - name: dia_semana
+        description: Día de la semana ISO, de 1 (lunes) a 7 (domingo).
+      - name: es_feriado
+        description: Feriado nacional.
+      - name: feriado
+        description: Nombre del feriado; nulo si no lo es.
+      - name: es_jueves_de_estreno
+        description: Los estrenos de cine salen los jueves.
+      - name: temporada
+        description: Verano, Vacaciones de medio año, Fin de año o Regular.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [Verano, Vacaciones de medio año, Fin de año, Regular]

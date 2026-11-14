@@ -1,0 +1,93 @@
+version: 2
+
+models:
+  - name: stg_sucursales__departamentos
+    columns:
+      - name: id_departamento
+        data_tests: [unique, not_null]
+
+  - name: stg_sucursales__provincias
+    columns:
+      - name: id_provincia
+        data_tests: [unique, not_null]
+      - name: id_departamento
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_sucursales__departamentos')
+                field: id_departamento
+
+  - name: stg_sucursales__distritos
+    columns:
+      - name: id_distrito
+        data_tests: [unique, not_null]
+      - name: id_provincia
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_sucursales__provincias')
+                field: id_provincia
+
+  - name: stg_sucursales__sedes
+    columns:
+      - name: id_sede
+        data_tests: [unique, not_null]
+      - name: id_distrito
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_sucursales__distritos')
+                field: id_distrito
+      - name: estado
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [Activo, Inactivo]
+
+  - name: stg_sucursales__salas
+    description: La capacidad debería coincidir con las butacas activas (prueba de aviso).
+    columns:
+      - name: id_sala
+        data_tests: [unique, not_null]
+      - name: id_sede
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_sucursales__sedes')
+                field: id_sede
+      - name: estado
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [Activo, Inactivo]
+
+  - name: stg_sucursales__butacas
+    description: Los ids tienen saltos; la butaca 1 no es la A1.
+    columns:
+      - name: id_butaca
+        data_tests: [unique, not_null]
+      - name: id_sala
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_sucursales__salas')
+                field: id_sala
+      - name: id_tipo_butaca
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_sucursales__tipos_butaca')
+                field: id_tipo_butaca
+      - name: estado
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [Activo, Inactivo]
+
+  - name: stg_sucursales__tipos_butaca
+    columns:
+      - name: id_tipo_butaca
+        data_tests: [unique, not_null]

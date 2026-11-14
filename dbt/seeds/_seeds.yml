@@ -1,0 +1,22 @@
+version: 2
+
+seeds:
+  - name: feriados_peru
+    description: Feriados nacionales (D. Leg. 713 y sus modificatorias), de 2025 a 2027.
+    config:
+      column_types:
+        fecha: date
+        feriado: text
+    columns:
+      - name: fecha
+        data_tests: [unique, not_null]
+
+  - name: temporadas
+    description: >
+      Temporadas del año como mes-día (MM-DD), sin cruzar el fin de año. Las usa
+      dim_fecha y también el generador de ventas.
+    config:
+      column_types:
+        temporada: text
+        desde: text
+        hasta: text

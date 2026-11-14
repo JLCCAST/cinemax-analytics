@@ -1,0 +1,43 @@
+version: 2
+
+models:
+  - name: stg_usuarios__usuarios
+    description: Cuentas de clientes y de personal. No tiene fecha de alta.
+    columns:
+      - name: id_usuario
+        data_tests: [unique, not_null]
+      - name: id_rol
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_usuarios__roles')
+                field: id_rol
+      - name: id_tipo_documento
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_usuarios__tipos_documento')
+                field: id_tipo_documento
+      - name: id_sede
+        description: Solo el personal tiene sede; los clientes, nulo.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_sucursales__sedes')
+                field: id_sede
+
+  - name: stg_usuarios__roles
+    columns:
+      - name: id_rol
+        data_tests: [unique, not_null]
+      - name: rol
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [ADMIN, GERENTE_GENERAL, GERENTE_MARKETING, GERENTE_OPERACIONES, CLIENTE]
+
+  - name: stg_usuarios__tipos_documento
+    columns:
+      - name: id_tipo_documento
+        data_tests: [unique, not_null]

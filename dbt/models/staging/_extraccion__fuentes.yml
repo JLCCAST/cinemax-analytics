@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: extraccion
+    schema: raw
+    description: Registro de cada carga de la extracción.
+    tables:
+      - name: cargas
+        identifier: _cargas

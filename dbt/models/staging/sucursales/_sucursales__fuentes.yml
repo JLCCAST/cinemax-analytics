@@ -1,0 +1,21 @@
+version: 2
+
+sources:
+  - name: sucursales
+    schema: raw
+    description: sucursales_db (MySQL) de sucursales-service.
+    tables:
+      - name: department
+        identifier: sucursales__department
+      - name: province
+        identifier: sucursales__province
+      - name: district
+        identifier: sucursales__district
+      - name: venue
+        identifier: sucursales__venue
+      - name: room
+        identifier: sucursales__room
+      - name: seat
+        identifier: sucursales__seat
+      - name: seat_type
+        identifier: sucursales__seat_type

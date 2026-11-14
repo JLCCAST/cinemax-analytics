@@ -1,0 +1,94 @@
+version: 2
+
+models:
+  - name: stg_cartelera__funciones
+    description: >
+      Una fila por función. Las funciones pasadas siguen en Programada: si ya
+      ocurrió se sabe por fecha_funcion y hora_inicio, no por el estado.
+    columns:
+      - name: id_funcion
+        data_tests: [unique, not_null]
+      - name: id_pelicula
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_cartelera__peliculas')
+                field: id_pelicula
+      - name: id_sala
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_sucursales__salas')
+                field: id_sala
+      - name: id_sede
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_sucursales__sedes')
+                field: id_sede
+      - name: fecha_funcion
+        data_tests: [not_null]
+      - name: hora_inicio
+        description: Hora de Lima.
+        data_tests: [not_null]
+      - name: precio_base
+        description: Precio de la entrada de adulto, en soles.
+        data_tests: [not_null]
+      - name: tipo_precio_origen
+        description: Cómo venía el precio en MongoDB (decimal128 en el seed, texto desde el servicio).
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [decimal128, texto, numero]
+      - name: butacas_vendidas
+        description: Contador de cartelera-service; nulo en las funciones del seed.
+      - name: estado
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [Programada, En Curso, Finalizada, Cancelada]
+
+  - name: stg_cartelera__peliculas
+    columns:
+      - name: id_pelicula
+        data_tests: [unique, not_null]
+      - name: titulo
+        data_tests: [not_null]
+      - name: id_clasificacion
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_cartelera__clasificaciones')
+                field: id_clasificacion
+      - name: estado
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [Cartelera, Estreno, Preventa]
+
+  - name: stg_cartelera__pelicula_genero
+    description: Una película puede tener varios géneros.
+    data_tests:
+      - unique:
+          arguments:
+            column_name: "id_pelicula || '-' || id_genero"
+    columns:
+      - name: id_genero
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_cartelera__generos')
+                field: id_genero
+
+  - name: stg_cartelera__generos
+    columns:
+      - name: id_genero
+        data_tests: [unique, not_null]
+
+  - name: stg_cartelera__clasificaciones
+    columns:
+      - name: id_clasificacion
+        data_tests: [unique, not_null]

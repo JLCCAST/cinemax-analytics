@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: usuarios
+    schema: raw
+    description: usuarios_db (PostgreSQL) de usuarios-service.
+    tables:
+      - name: user_account
+        identifier: usuarios__user_account
+        description: Sin nombre, correo, teléfono, documento ni contraseña (no se extraen).
+      - name: role
+        identifier: usuarios__role
+      - name: document_type
+        identifier: usuarios__document_type

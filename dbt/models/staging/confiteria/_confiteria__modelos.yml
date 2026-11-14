@@ -1,0 +1,25 @@
+version: 2
+
+models:
+  - name: stg_confiteria__productos
+    description: El precio es el vigente hoy; el de cada venta está en la línea de la venta.
+    columns:
+      - name: id_producto
+        data_tests: [unique, not_null]
+      - name: id_categoria
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_confiteria__categorias')
+                field: id_categoria
+      - name: estado
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [Activo, Inactivo]
+
+  - name: stg_confiteria__categorias
+    columns:
+      - name: id_categoria
+        data_tests: [unique, not_null]

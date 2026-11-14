@@ -1,0 +1,12 @@
+cinemax_analytics:
+  target: local
+  outputs:
+    local:
+      type: postgres
+      host: "{{ env_var('DWH_HOST', '127.0.0.1') }}"
+      port: "{{ env_var('PUERTO_DWH', '5440') | as_number }}"
+      user: "{{ env_var('DWH_USER') }}"
+      password: "{{ env_var('DWH_PASSWORD') }}"
+      dbname: "{{ env_var('DWH_DB', 'cinemax_dwh') }}"
+      schema: staging
+      threads: 4

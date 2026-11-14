@@ -1,0 +1,149 @@
+version: 2
+
+models:
+  - name: stg_facturacion__ventas
+    description: Una fila por transacción. CineMax solo escribe el estado COMPLETADO.
+    columns:
+      - name: id_venta
+        data_tests: [unique, not_null]
+      - name: id_usuario
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_usuarios__usuarios')
+                field: id_usuario
+      - name: id_estado_venta
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_facturacion__estados_venta')
+                field: id_estado_venta
+      - name: id_promocion
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_facturacion__promociones')
+                field: id_promocion
+      - name: id_funcion
+        description: Nulo en un pedido solo de confitería.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_cartelera__funciones')
+                field: id_funcion
+      - name: id_sede
+        description: Sede de la función o de recojo de la confitería.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_sucursales__sedes')
+                field: id_sede
+      - name: metodo_pago
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [TARJETA, YAPE]
+      - name: pagado_en_utc
+        data_tests: [not_null]
+
+  - name: stg_facturacion__entradas
+    description: Una fila por butaca vendida.
+    columns:
+      - name: id_entrada
+        data_tests: [unique, not_null]
+      - name: id_venta
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_facturacion__ventas')
+                field: id_venta
+      - name: id_funcion
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_cartelera__funciones')
+                field: id_funcion
+      - name: id_butaca
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_sucursales__butacas')
+                field: id_butaca
+      - name: categoria_tarifa
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [ADULTO, NINO, ADULTO_MAYOR, DISCAPACITADO]
+
+  - name: stg_facturacion__lineas_confiteria
+    description: Una fila por producto de confitería dentro de una venta.
+    columns:
+      - name: id_linea
+        data_tests: [unique, not_null]
+      - name: id_venta
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_facturacion__ventas')
+                field: id_venta
+      - name: id_producto
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_confiteria__productos')
+                field: id_producto
+
+  - name: stg_facturacion__estados_venta
+    columns:
+      - name: id_estado_venta
+        data_tests: [unique, not_null]
+      - name: estado
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [PENDIENTE, PAGADO, CANCELADO, COMPLETADO]
+
+  - name: stg_facturacion__tipos_promocion
+    columns:
+      - name: id_tipo_promocion
+        data_tests: [unique, not_null]
+      - name: tipo_promocion
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [PORCENTAJE, MONTO_FIJO, DOS_POR_UNO, ENTRADA_GRATIS]
+
+  - name: stg_facturacion__promociones
+    description: >
+      Una promoción se evalúa con la fecha y la hora de la función, no con la de compra.
+      Se aplica una por venta: la de mayor descuento.
+    columns:
+      - name: id_promocion
+        data_tests: [unique, not_null]
+      - name: id_tipo_promocion
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_facturacion__tipos_promocion')
+                field: id_tipo_promocion
+      - name: dias_semana_iso
+        description: Días ISO separados por coma (1 = lunes ... 7 = domingo).
+      - name: id_categoria_requerida
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_confiteria__categorias')
+                field: id_categoria
+      - name: alcance
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [ENTRADAS, CONFITERIA, TODO]

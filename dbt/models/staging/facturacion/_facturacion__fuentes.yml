@@ -1,0 +1,19 @@
+version: 2
+
+sources:
+  - name: facturacion
+    schema: raw
+    description: sales_db (PostgreSQL) de facturacion-service.
+    tables:
+      - name: sale_transaction
+        identifier: facturacion__sale_transaction
+      - name: sale_ticket_detail
+        identifier: facturacion__sale_ticket_detail
+      - name: sale_snack_detail
+        identifier: facturacion__sale_snack_detail
+      - name: transaction_status
+        identifier: facturacion__transaction_status
+      - name: promotion
+        identifier: facturacion__promotion
+      - name: promotion_type
+        identifier: facturacion__promotion_type

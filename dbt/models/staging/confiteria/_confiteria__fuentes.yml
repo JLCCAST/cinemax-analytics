@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: confiteria
+    schema: raw
+    description: confiteria_db (MySQL) de confiteria-service. El stock no se extrae.
+    tables:
+      - name: snack
+        identifier: confiteria__snack
+      - name: snack_category
+        identifier: confiteria__snack_category
