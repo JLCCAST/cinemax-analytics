@@ -108,6 +108,7 @@ dependencies = [
     { name = "pymongo" },
     { name = "pymysql" },
     { name = "python-dotenv" },
+    { name = "tzdata" },
 ]
 
 [package.dev-dependencies]
@@ -124,6 +125,7 @@ requires-dist = [
     { name = "pymongo", specifier = ">=4.20.0" },
     { name = "pymysql", specifier = ">=1.2.4" },
     { name = "python-dotenv", specifier = ">=1.2.4" },
+    { name = "tzdata", specifier = ">=2026.6" },
 ]
 
 [package.metadata.requires-dev]
