@@ -1,3 +1,5 @@
+{{ config(severity='warn') }}
+
 -- Cada venta cuadra con sus líneas, como la calcula facturacion-service:
 -- subtotal = entradas + confitería, descuento = suma de los descuentos por línea
 -- y total = subtotal - descuento.

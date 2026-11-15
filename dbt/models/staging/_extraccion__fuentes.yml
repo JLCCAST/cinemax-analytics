@@ -7,3 +7,6 @@ sources:
     tables:
       - name: cargas
         identifier: _cargas
+      - name: defectos_inyectados
+        identifier: _defectos_inyectados
+        description: Lo que escribió generador.defectos; vacía si no se inyectó nada.

@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: calidad_chequeos
+    description: Un chequeo de calidad por fila, con las filas revisadas y las que fallaron.
+    columns:
+      - name: chequeo
+        data_tests: [unique, not_null]
+      - name: tipo
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [error, informativo]
+
+  - name: calidad_deteccion
+    description: Defectos inyectados frente a detectados. coincide = falso es un error del pipeline.
+    columns:
+      - name: chequeo
+        data_tests: [unique, not_null]
+      - name: coincide
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [true]

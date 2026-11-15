@@ -13,6 +13,8 @@ models:
               arguments:
                 to: ref('stg_usuarios__usuarios')
                 field: id_usuario
+              config:
+                severity: warn
       - name: id_estado_venta
         data_tests:
           - not_null
@@ -74,6 +76,8 @@ models:
               arguments:
                 to: ref('stg_sucursales__butacas')
                 field: id_butaca
+              config:
+                severity: warn
       - name: categoria_tarifa
         data_tests:
           - accepted_values:

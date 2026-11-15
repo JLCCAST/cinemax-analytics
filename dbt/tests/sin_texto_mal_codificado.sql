@@ -1,3 +1,5 @@
+{{ config(severity='warn') }}
+
 -- Texto UTF-8 leído como latin1: "María" termina como "MarÃ­a".
 -- Pasaba con el init-script de MySQL; con Flyway ya no debería volver.
 {% set columnas = {
