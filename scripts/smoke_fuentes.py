@@ -56,8 +56,13 @@ CONTEOS = {
 fallas: list[str] = []
 
 
+# Con --generado, los conteos del seed son mínimos: el generador agrega filas.
+MINIMOS = "--generado" in sys.argv
+
+
 def revisar(fuente: str, que: str, esperado, real) -> None:
-    ok = esperado is None or esperado == real
+    contable = isinstance(esperado, int) and isinstance(real, int) and que != "flyway"
+    ok = esperado is None or esperado == real or (MINIMOS and contable and real >= esperado)
     marca = "ok" if ok else "FALLA"
     print(f"  {que:<32} {esperado if esperado is not None else '-'!s:>9} {real!s:>9}  {marca}")
     if not ok:

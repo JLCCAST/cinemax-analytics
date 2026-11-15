@@ -18,6 +18,10 @@ Las ventas son sintéticas. El generador escribe directo en las bases de CineMax
 - `dbt/`: staging de cada fuente, `dim_fecha` con los feriados de Perú y pruebas de calidad (claves, relaciones entre bases distintas y que cada venta cuadre con sus líneas).
 - `src/cinemax_analytics/generador`: un año de ventas sintéticas (unas 150 000) con 3 sedes nuevas, 52 películas inventadas y 20 000 clientes. Usa las tarifas y el motor de promociones de CineMax pasados a Python, comprobados contra compras reales del sistema. Con la misma semilla da exactamente los mismos datos. Los parámetros de demanda están en `generador/parametros.py`.
 
+## Calidad de datos
+
+`dbt/models/calidad` revisa 14 problemas posibles: copias incompletas, texto mal codificado, contadores de butacas que no cuadran, ids huérfanos entre bases, ventas que no cuadran con sus líneas o pagadas después de la función, y precios fuera de tarifa. Para probarlo, `python -m cinemax_analytics.generador.defectos` mete esos defectos con tasas conocidas, y `scripts/reporte_calidad.py` compara lo inyectado con lo detectado. Hoy cada chequeo encuentra exactamente lo inyectado.
+
 ## Cómo correrlo
 
 Hace falta Docker y [uv](https://docs.astral.sh/uv/).
@@ -29,8 +33,10 @@ cp .env.example .env    # cambia las contraseñas
 docker compose up -d
 uv run python scripts/smoke_fuentes.py
 uv run python -m cinemax_analytics.generador --semilla 42 --desde 2025-11-01 --hasta 2026-10-31
+uv run python scripts/smoke_fuentes.py --generado
 uv run python -m cinemax_analytics.extraccion
 uv run --env-file .env dbt build
+uv run python scripts/reporte_calidad.py
 uv run pytest
 ```
 
@@ -38,7 +44,7 @@ uv run pytest
 
 - [x] Entorno, extracción y staging en dbt
 - [x] Generador de ventas sintéticas
-- [ ] Calidad de datos y conciliación
+- [x] Calidad de datos y conciliación
 - [ ] Modelo estrella y dashboard en Power BI
 - [ ] Agente de text-to-SQL con LangGraph y su evaluación
 - [ ] Orquestación con Airflow
