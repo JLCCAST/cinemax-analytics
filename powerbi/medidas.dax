@@ -1,0 +1,38 @@
+// Medidas del modelo. Tablas importadas desde el esquema marts del warehouse.
+// Relaciones: fact_* [*_key] -> dim_* [*_key]; fact_ticket[fecha_funcion_key] y
+// fact_ocupacion_funcion[fecha_funcion_key] -> dim_fecha[fecha_key] (activa),
+// fact_ticket[fecha_venta_key] -> dim_fecha[fecha_key] (inactiva, usar USERELATIONSHIP).
+
+Ingresos = SUM ( fact_venta[total] )
+Ventas = COUNTROWS ( fact_venta )
+Ticket promedio = DIVIDE ( [Ingresos], [Ventas] )
+Entradas = COUNTROWS ( fact_ticket )
+Ingreso entradas = SUM ( fact_ticket[ingreso_neto] )
+Ingreso confitería = SUM ( fact_confiteria[importe_neto] )
+Descuento total = SUM ( fact_venta[descuento] )
+
+Ocupación = DIVIDE ( SUM ( fact_ocupacion_funcion[vendidas] ), SUM ( fact_ocupacion_funcion[capacidad] ) )
+Entradas por función = DIVIDE ( SUM ( fact_ocupacion_funcion[vendidas] ), COUNTROWS ( fact_ocupacion_funcion ) )
+
+% ventas con confitería =
+    DIVIDE (
+        CALCULATE ( [Ventas], fact_venta[con_confiteria] = TRUE (), fact_venta[solo_confiteria] = FALSE () ),
+        CALCULATE ( [Ventas], fact_venta[solo_confiteria] = FALSE () )
+    )
+
+% ventas con combo =
+    DIVIDE (
+        CALCULATE ( [Ventas], fact_venta[con_combo] = TRUE (), fact_venta[solo_confiteria] = FALSE () ),
+        CALCULATE ( [Ventas], fact_venta[solo_confiteria] = FALSE () )
+    )
+
+% ventas con promoción =
+    DIVIDE ( CALCULATE ( [Ventas], fact_venta[promocion_key] <> -1 ), [Ventas] )
+
+Entradas por fecha de venta =
+    CALCULATE ( [Entradas], USERELATIONSHIP ( fact_ticket[fecha_venta_key], dim_fecha[fecha_key] ) )
+
+Ingreso por género (repartido) =
+    SUMX ( puente_pelicula_genero,
+        puente_pelicula_genero[peso]
+            * CALCULATE ( [Ingreso entradas], TREATAS ( { puente_pelicula_genero[pelicula_key] }, fact_ticket[pelicula_key] ) ) )

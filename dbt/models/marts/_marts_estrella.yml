@@ -1,0 +1,116 @@
+version: 2
+
+models:
+  - name: dim_sede
+    description: Sede del cine con su ubicación. -1 = desconocida.
+    columns:
+      - name: sede_key
+        data_tests: [unique, not_null]
+  - name: dim_sala
+    description: Sala con los atributos de su sede. capacidad = butacas activas.
+    columns:
+      - name: sala_key
+        data_tests: [unique, not_null]
+      - name: es_vip
+        description: La sala lleva VIP en el nombre.
+  - name: dim_pelicula
+    description: Película. genero_principal es el primero en orden alfabético; para repartir por todos sus géneros usar puente_pelicula_genero.
+    columns:
+      - name: pelicula_key
+        data_tests: [unique, not_null]
+      - name: fecha_estreno
+        description: Fecha de estreno; la antigüedad en cartelera se mide desde aquí.
+  - name: puente_pelicula_genero
+    description: Película por género. Multiplicar una medida por peso (1 / géneros de la película) reparte sin duplicar.
+  - name: dim_tarifa
+    description: Tipo de entrada. El precio sale del precio base de la función por la proporción.
+    columns:
+      - name: tarifa_key
+        data_tests: [unique, not_null]
+  - name: dim_producto
+    description: Producto de confitería con su precio actual (el de cada venta está en el hecho).
+    columns:
+      - name: producto_key
+        data_tests: [unique, not_null]
+  - name: dim_promocion
+    description: Promoción. -1 = sin promoción. Se evalúa con la fecha de la función, no la de compra.
+    columns:
+      - name: promocion_key
+        data_tests: [unique, not_null]
+  - name: dim_cliente
+    description: Cliente sin datos personales. cohorte = mes de la primera compra.
+    columns:
+      - name: cliente_key
+        data_tests: [unique, not_null]
+  - name: dim_franja_horaria
+    description: Hora del día y su franja (matiné antes de las 15).
+    columns:
+      - name: hora
+        data_tests: [unique, not_null]
+
+  - name: fact_ticket
+    description: Una fila por butaca vendida en ventas pagadas. Importes en soles.
+    columns:
+      - name: id_entrada
+        data_tests: [unique, not_null]
+      - name: fecha_venta_key
+        description: Fecha de compra (hora de Lima), AAAAMMDD.
+        data_tests: [{relationships: {arguments: {to: ref('dim_fecha'), field: fecha_key}}}]
+      - name: fecha_funcion_key
+        description: Fecha de la función, AAAAMMDD. Ocupación y asistencia van por esta fecha.
+        data_tests: [{relationships: {arguments: {to: ref('dim_fecha'), field: fecha_key}}}]
+      - name: pelicula_key
+        data_tests: [{relationships: {arguments: {to: ref('dim_pelicula'), field: pelicula_key}}}]
+      - name: sala_key
+        data_tests: [{relationships: {arguments: {to: ref('dim_sala'), field: sala_key}}}]
+      - name: tarifa_key
+        data_tests: [{relationships: {arguments: {to: ref('dim_tarifa'), field: tarifa_key}}}]
+      - name: promocion_key
+        data_tests: [{relationships: {arguments: {to: ref('dim_promocion'), field: promocion_key}}}]
+      - name: cliente_key
+        data_tests: [{relationships: {arguments: {to: ref('dim_cliente'), field: cliente_key}}}]
+      - name: precio_lista
+        description: Precio según la tarifa de CineMax, antes del descuento.
+      - name: ingreso_neto
+        description: Precio cobrado menos el descuento de la promoción.
+      - name: dias_anticipacion
+        description: Días entre la compra y la función.
+      - name: semana_desde_estreno
+        description: 0 = semana del estreno.
+
+  - name: fact_confiteria
+    description: Una fila por producto vendido en ventas pagadas.
+    columns:
+      - name: id_linea
+        data_tests: [unique, not_null]
+      - name: producto_key
+        data_tests: [{relationships: {arguments: {to: ref('dim_producto'), field: producto_key}}}]
+      - name: pelicula_key
+        description: Película de la venta; -1 en pedidos solo de confitería.
+        data_tests: [{relationships: {arguments: {to: ref('dim_pelicula'), field: pelicula_key}}}]
+      - name: sede_key
+        data_tests: [{relationships: {arguments: {to: ref('dim_sede'), field: sede_key}}}]
+
+  - name: fact_venta
+    description: Una fila por transacción pagada. Para ticket promedio, medio de pago y efecto de promociones.
+    columns:
+      - name: id_venta
+        data_tests: [unique, not_null]
+      - name: sede_key
+        data_tests: [{relationships: {arguments: {to: ref('dim_sede'), field: sede_key}}}]
+      - name: total
+        description: Lo cobrado, en soles (subtotal - descuento).
+      - name: metodo_pago
+        data_tests: [{accepted_values: {arguments: {values: [TARJETA, YAPE]}}}]
+
+  - name: fact_ocupacion_funcion
+    description: Una fila por función, incluidas las que no vendieron. ocupacion = vendidas / capacidad.
+    columns:
+      - name: id_funcion
+        data_tests: [unique, not_null]
+      - name: sala_key
+        data_tests: [{relationships: {arguments: {to: ref('dim_sala'), field: sala_key}}}]
+      - name: ocupacion
+        description: Entre 0 y 1.
+      - name: ingreso_confiteria
+        description: Confitería vendida junto con entradas de esta función.
