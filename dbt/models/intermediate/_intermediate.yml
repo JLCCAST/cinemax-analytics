@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: int_salas
+    description: Sala con su sede y ubicación. capacidad = butacas activas.
+    columns:
+      - name: id_sala
+        data_tests: [unique, not_null]
+
+  - name: int_funciones
+    description: Función con vendidas recalculadas desde las entradas y los desfases contra MongoDB.
+    columns:
+      - name: id_funcion
+        data_tests: [unique, not_null]
+      - name: capacidad
+        data_tests: [not_null]
+
+  - name: int_ventas
+    description: Venta con los totales de sus líneas y los datos de la función.
+    columns:
+      - name: id_venta
+        data_tests: [unique, not_null]
+      - name: fecha_venta
+        description: Fecha de pago en hora de Lima.
+        data_tests: [not_null]
+
+  - name: int_entradas
+    description: Butaca vendida con la venta, la función y el precio de lista según la tarifa.
+    columns:
+      - name: id_entrada
+        data_tests: [unique, not_null]
+
+  - name: int_lineas_confiteria
+    description: Producto vendido con la película de la venta.
+    columns:
+      - name: id_linea
+        data_tests: [unique, not_null]

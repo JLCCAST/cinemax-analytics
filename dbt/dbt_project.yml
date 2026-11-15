@@ -10,6 +10,10 @@ macro-paths: ["macros"]
 target-path: target
 clean-targets: ["target", "dbt_packages"]
 
+# La tabla existe aunque nunca se hayan inyectado defectos.
+on-run-start:
+  - "create table if not exists raw._defectos_inyectados (chequeo text primary key, filas bigint not null, semilla integer not null, inyectado_en timestamptz not null default now())"
+
 vars:
   dim_fecha_desde: "2025-01-01"
   dim_fecha_hasta: "2027-12-31"
@@ -19,6 +23,12 @@ models:
     staging:
       +schema: staging
       +materialized: view
+    intermediate:
+      +schema: intermediate
+      +materialized: table
+    calidad:
+      +schema: calidad
+      +materialized: table
     marts:
       +schema: marts
       +materialized: table
