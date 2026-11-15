@@ -11,8 +11,18 @@ Ingreso entradas = SUM ( fact_ticket[ingreso_neto] )
 Ingreso confitería = SUM ( fact_confiteria[importe_neto] )
 Descuento total = SUM ( fact_venta[descuento] )
 
-Ocupación = DIVIDE ( SUM ( fact_ocupacion_funcion[vendidas] ), SUM ( fact_ocupacion_funcion[capacidad] ) )
-Entradas por función = DIVIDE ( SUM ( fact_ocupacion_funcion[vendidas] ), COUNTROWS ( fact_ocupacion_funcion ) )
+// Las funciones canceladas no cuentan para la ocupación.
+Ocupación =
+    CALCULATE (
+        DIVIDE ( SUM ( fact_ocupacion_funcion[vendidas] ), SUM ( fact_ocupacion_funcion[capacidad] ) ),
+        fact_ocupacion_funcion[estado] = "Programada"
+    )
+Entradas por función =
+    CALCULATE (
+        DIVIDE ( SUM ( fact_ocupacion_funcion[vendidas] ), COUNTROWS ( fact_ocupacion_funcion ) ),
+        fact_ocupacion_funcion[estado] = "Programada"
+    )
+Ingreso por entrada = DIVIDE ( [Ingreso entradas], [Entradas] )
 
 % ventas con confitería =
     DIVIDE (
