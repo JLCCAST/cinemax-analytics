@@ -1,0 +1,54 @@
+name: Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.8"
+
+      - name: Estilo
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: .env con claves de prueba
+        run: |
+          cp .env.example .env
+          for clave in FUENTES_PASSWORD DWH_PASSWORD AGENTE_DWH_PASSWORD AIRFLOW_DB_PASSWORD; do
+            sed -i "s/^${clave}=.*/${clave}=$(openssl rand -hex 16)/" .env
+          done
+
+      - name: Bases de origen y warehouse
+        run: |
+          docker compose up -d
+          uv run python scripts/smoke_fuentes.py
+
+      - name: Generar un año de ventas
+        run: uv run python -m cinemax_analytics.generador --semilla 42 --desde 2025-11-01 --hasta 2026-10-31
+
+      - name: Extraer y construir el warehouse
+        run: |
+          uv run python -m cinemax_analytics.extraccion
+          uv run --env-file .env dbt build
+          uv run python scripts/reporte_calidad.py
+
+      - name: Pruebas
+        run: |
+          uv run python -m cinemax_analytics.agente.preparar
+          uv run pytest
+
+      - name: Estado de los contenedores si algo falla
+        if: failure()
+        run: docker compose ps -a && docker compose logs --no-color --tail=100

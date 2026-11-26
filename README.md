@@ -73,6 +73,20 @@ El fallo: para "entradas por función en la semana de estreno" contó solo las f
 
 En la corrida del 25 de noviembre de 2026, seis preguntas recibieron un error 503 de Gemini (modelo saturado) y se repitieron; el evaluador ahora reintenta solo ese tipo de error.
 
+## Orquestación
+
+Un DAG de Airflow (`airflow/dags/cinemax_analytics.py`) corre todos los días a las 3:00: extrae las 5 bases, construye el warehouse con dbt y genera el reporte de calidad. Con [Cosmos](https://github.com/astronomer/astronomer-cosmos), cada modelo de dbt es una tarea de Airflow y sus pruebas corren justo después, así que si una falla se ve en qué modelo fue. Son 98 tareas y la corrida completa tarda unos 6 minutos.
+
+Airflow corre en Docker, en modo `standalone` y con su propia base de metadatos. dbt va en un entorno de Python aparte dentro de la imagen, para que sus dependencias no choquen con las de Airflow.
+
+```bash
+docker compose --profile airflow up -d --build
+```
+
+La interfaz queda en http://127.0.0.1:8081, sin usuario, porque solo se publica en este equipo.
+
+Además, GitHub Actions (`.github/workflows/ci.yml`) repite el pipeline completo en cada push: levanta las bases, genera el año de ventas, extrae, corre `dbt build` y las pruebas.
+
 ## Cómo correrlo
 
 Hace falta Docker y [uv](https://docs.astral.sh/uv/).
@@ -101,4 +115,4 @@ Para el agente hace falta una clave de Gemini en `.env` (`GEMINI_API_KEY`). La e
 - [x] Calidad de datos y conciliación
 - [x] Modelo estrella y dashboard en Power BI
 - [x] Agente de text-to-SQL con LangGraph y su evaluación
-- [ ] Orquestación con Airflow
+- [x] Orquestación con Airflow y CI

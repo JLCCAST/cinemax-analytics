@@ -36,6 +36,11 @@ class Fuente:
     def puerto(self) -> int:
         return int(os.getenv(self.variable_puerto, self.puerto_defecto))
 
+    @property
+    def host(self) -> str:
+        """Desde el PC, todas en 127.0.0.1; dentro de Docker (Airflow), cada una con su nombre."""
+        return os.getenv(f"HOST_{self.nombre.upper()}", HOST)
+
 
 FUENTES = {
     f.nombre: f
@@ -51,7 +56,7 @@ FUENTES = {
 
 def conectar_postgres(fuente: Fuente) -> psycopg.Connection:
     return psycopg.connect(
-        host=HOST,
+        host=fuente.host,
         port=fuente.puerto,
         dbname=fuente.base,
         user=_env("FUENTES_USER"),
@@ -61,7 +66,7 @@ def conectar_postgres(fuente: Fuente) -> psycopg.Connection:
 
 def conectar_mysql(fuente: Fuente, **opciones) -> pymysql.Connection:
     return pymysql.connect(
-        host=HOST,
+        host=fuente.host,
         port=fuente.puerto,
         database=fuente.base,
         user=_env("FUENTES_USER"),
@@ -75,7 +80,7 @@ def conectar_mongo(fuente: Fuente = FUENTES["cartelera"]):
     usuario = quote_plus(_env("FUENTES_USER"))
     clave = quote_plus(_env("FUENTES_PASSWORD"))
     cliente = MongoClient(
-        f"mongodb://{usuario}:{clave}@{HOST}:{fuente.puerto}/?authSource=admin",
+        f"mongodb://{usuario}:{clave}@{fuente.host}:{fuente.puerto}/?authSource=admin",
         tz_aware=True,
     )
     return cliente[fuente.base]

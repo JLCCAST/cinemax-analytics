@@ -169,6 +169,66 @@ services:
       retries: 10
       start_period: 20s
 
+  # Orquestación (fase 5). Solo arranca con: docker compose --profile airflow up -d
+  # La interfaz queda en http://127.0.0.1:8081, sin usuario porque solo se publica en este PC.
+
+  airflow-db:
+    image: postgres:16.15
+    profiles: [airflow]
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: ${AIRFLOW_DB_PASSWORD:?falta AIRFLOW_DB_PASSWORD en .env}
+      POSTGRES_DB: airflow
+    volumes:
+      - airflow-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U airflow -d airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  airflow:
+    build:
+      context: .
+      dockerfile: airflow/Dockerfile
+    image: cinemax-analytics-airflow
+    profiles: [airflow]
+    command: standalone
+    ports:
+      - "127.0.0.1:${PUERTO_AIRFLOW:-8081}:8080"
+    env_file: .env
+    environment:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:${AIRFLOW_DB_PASSWORD}@airflow-db:5432/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__PARALLELISM: 4
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__DEFAULT_TIMEZONE: America/Lima
+      AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS: "true"
+      # Dentro de la red de Docker cada base tiene su nombre y su puerto interno.
+      HOST_USUARIOS: usuarios
+      PUERTO_USUARIOS: 5432
+      HOST_FACTURACION: facturacion
+      PUERTO_FACTURACION: 5432
+      HOST_SUCURSALES: sucursales
+      PUERTO_SUCURSALES: 3306
+      HOST_CONFITERIA: confiteria
+      PUERTO_CONFITERIA: 3306
+      HOST_CARTELERA: cartelera
+      PUERTO_CARTELERA: 27017
+      DWH_HOST: dwh
+      PUERTO_DWH: 5432
+      DBT_PROJECT_DIR: /opt/cinemax-analytics/dbt
+      DBT_PROFILES_DIR: /opt/cinemax-analytics/dbt
+    volumes:
+      - .:/opt/cinemax-analytics
+      - ./airflow/dags:/opt/airflow/dags
+    depends_on:
+      airflow-db:
+        condition: service_healthy
+      dwh:
+        condition: service_healthy
+
 volumes:
   usuarios:
   facturacion:
@@ -176,3 +236,4 @@ volumes:
   confiteria:
   cartelera:
   dwh:
+  airflow-db:
