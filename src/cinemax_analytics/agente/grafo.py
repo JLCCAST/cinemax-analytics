@@ -67,7 +67,9 @@ def construir_agente(modelo: str | None = None):
         model=modelo or os.getenv("AGENTE_MODELO", MODELO_POR_DEFECTO),
         api_key=os.getenv("GEMINI_API_KEY"),
         temperature=0,
-        max_retries=6,
+        # Sin tope, una llamada colgada detiene todo: pasó en la primera evaluación.
+        timeout=60,
+        max_retries=3,
     )
     llm_con_herramientas = llm.bind_tools(HERRAMIENTAS)
     sistema = SystemMessage(prompt_del_sistema(vistas_disponibles()))

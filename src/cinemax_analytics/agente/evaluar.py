@@ -17,7 +17,12 @@ import psycopg
 import yaml
 
 from cinemax_analytics.agente.comparar import coinciden
-from cinemax_analytics.agente.grafo import MODELO_POR_DEFECTO, construir_agente, preguntar
+from cinemax_analytics.agente.grafo import (
+    MODELO_POR_DEFECTO,
+    Respuesta,
+    construir_agente,
+    preguntar,
+)
 from cinemax_analytics.agente.herramientas import correr
 from cinemax_analytics.agente.seguridad import ConsultaRechazada
 from cinemax_analytics.fuentes import RAIZ
@@ -42,6 +47,27 @@ def calificar(pregunta: dict, respuesta) -> str:
     except (ConsultaRechazada, psycopg.Error):
         return "fallo"
     return "ok" if coinciden(esperado, obtenido) else "fallo"
+
+
+ERRORES_PASAJEROS = ("503", "UNAVAILABLE", "429", "RESOURCE_EXHAUSTED", "DEADLINE")
+INTENTOS = 4
+ESPERA_ENTRE_INTENTOS = 30
+
+
+def _intentar(agente, pregunta: dict) -> tuple[Respuesta, str]:
+    """Reintenta cuando Gemini está saturado (503) o limita la cuota (429): eso mide la API,
+    no al agente. Si se agotan los intentos, la pregunta queda como "error"."""
+    for intento in range(1, INTENTOS + 1):
+        try:
+            respuesta = preguntar(agente, pregunta["pregunta"])
+            return respuesta, calificar(pregunta, respuesta)
+        except Exception as error:  # noqa: BLE001  (una falla de la API no corta la evaluación)
+            ultimo = error
+            if intento == INTENTOS or not any(c in str(error) for c in ERRORES_PASAJEROS):
+                break
+            time.sleep(ESPERA_ENTRE_INTENTOS * intento)
+    texto = f"ERROR: {ultimo}"[:300]
+    return Respuesta(texto=texto, sql_final=None, segundos=0, tokens=0), "error"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -69,8 +95,7 @@ def main(argv: list[str] | None = None) -> int:
     for n, pregunta in enumerate(preguntas):
         if n:
             time.sleep(args.pausa)
-        respuesta = preguntar(agente, pregunta["pregunta"])
-        nota = calificar(pregunta, respuesta)
+        respuesta, nota = _intentar(agente, pregunta)
         detalle.append(
             {
                 "id": pregunta["id"],
@@ -97,6 +122,7 @@ def main(argv: list[str] | None = None) -> int:
         "abstencion_correcta": sum(d["resultado"] == "abstencion_correcta" for d in sin_datos)
         / max(1, len(sin_datos)),
         "abstenciones_de_mas": sum(d["resultado"] == "abstencion_incorrecta" for d in respondibles),
+        "errores_de_la_api": sum(d["resultado"] == "error" for d in detalle),
         "segundos_mediana": median(d["segundos"] for d in detalle),
         "segundos_promedio": mean(d["segundos"] for d in detalle),
         "tokens_promedio": mean(d["tokens"] for d in detalle),

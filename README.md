@@ -42,6 +42,37 @@ Modelo estrella en `dbt/models/marts`: cuatro hechos (`fact_ticket`, `fact_venta
 
 ![Confitería y promociones](powerbi/capturas/4-confiteria-y-promociones.png)
 
+## Agente de consultas
+
+Responde en español preguntas sobre el warehouse escribiendo y ejecutando SQL. Es un ciclo ReAct en LangGraph con Gemini (`gemini-3.1-flash-lite`): el modelo decide qué herramienta usar, mira el resultado y repite hasta responder.
+
+```bash
+uv run python -m cinemax_analytics.agente "¿qué película vendió más entradas en julio?"
+```
+
+- Solo ve el esquema `semantic` (`dbt/models/semantic`): seis vistas ya unidas, con nombres en español y una descripción por columna que el agente lee.
+- Tiene cuatro herramientas: listar vistas, describir una vista con ejemplos de valores, buscar cómo está escrito un nombre (con `pg_trgm` y `unaccent`) y ejecutar SQL.
+- Seguridad en dos capas. La base: un rol de solo lectura, sin acceso a otros esquemas y con 5 s como máximo por consulta. Antes de ejecutar: un validador con `sqlglot` que acepta una sola consulta SELECT sobre esas vistas.
+- Un glosario (`agente/glosario.yaml`) fija sinónimos, cómo se calculan las métricas y qué datos no existen, para que el agente diga que no sabe en vez de inventar.
+
+### Evaluación
+
+25 preguntas (`agente/preguntas.yaml`): 10 fáciles, 8 medias, 4 difíciles y 3 que no se pueden responder con estos datos (stock, correos de clientes, ganancias). Se compara el resultado de la consulta del agente con el de una consulta de referencia, no el texto del SQL.
+
+| Grupo | Resultado |
+|---|---|
+| Fáciles | 10 de 10 |
+| Medias | 8 de 8 |
+| Difíciles | 3 de 4 |
+| Sin datos (debe decir que no hay datos) | 3 de 3 |
+| Dijo "no hay datos" cuando sí había | 0 |
+
+Tiempo por pregunta: mediana de 23 s, con unos 6 300 tokens. El tiempo lo pone casi todo la cola del plan gratuito de Gemini; las consultas tardan menos de 1 s.
+
+El fallo: para "entradas por función en la semana de estreno" contó solo las funciones que vendieron algo, y le dio 22,4 en vez de 22,0. Es la diferencia entre promediar sobre las funciones con ventas y sobre todas las programadas.
+
+En la corrida del 25 de noviembre de 2026, seis preguntas recibieron un error 503 de Gemini (modelo saturado) y se repitieron; el evaluador ahora reintenta solo ese tipo de error.
+
 ## Cómo correrlo
 
 Hace falta Docker y [uv](https://docs.astral.sh/uv/).
@@ -57,8 +88,11 @@ uv run python scripts/smoke_fuentes.py --generado
 uv run python -m cinemax_analytics.extraccion
 uv run --env-file .env dbt build
 uv run python scripts/reporte_calidad.py
+uv run python -m cinemax_analytics.agente.preparar      # rol de solo lectura del agente
 uv run pytest
 ```
+
+Para el agente hace falta una clave de Gemini en `.env` (`GEMINI_API_KEY`). La evaluación se corre con `uv run python -m cinemax_analytics.agente.evaluar`.
 
 ## Avance
 
@@ -66,5 +100,5 @@ uv run pytest
 - [x] Generador de ventas sintéticas
 - [x] Calidad de datos y conciliación
 - [x] Modelo estrella y dashboard en Power BI
-- [ ] Agente de text-to-SQL con LangGraph y su evaluación
+- [x] Agente de text-to-SQL con LangGraph y su evaluación
 - [ ] Orquestación con Airflow
