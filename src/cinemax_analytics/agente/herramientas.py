@@ -77,8 +77,9 @@ def describir_vista(vista: str) -> str:
         return f"No existe la vista {vista}. Usa listar_vistas."
     with conectar_agente() as conexion:
         columnas = _columnas(conexion, vista)
+        # Muestra al azar: las primeras filas caen todas en los mismos meses.
         muestra = conexion.execute(
-            sql.SQL("SELECT * FROM {} LIMIT {}").format(
+            sql.SQL("SELECT * FROM {} ORDER BY random() LIMIT {}").format(
                 sql.Identifier(ESQUEMA, vista), sql.Literal(MUESTRA)
             )
         ).fetchall()
