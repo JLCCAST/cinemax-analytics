@@ -12,3 +12,6 @@ dbt/.user.yml
 logs/
 
 *.pbix.bak
+
+# Power BI: el archivo no se versiona, solo las capturas
+*.pbix
