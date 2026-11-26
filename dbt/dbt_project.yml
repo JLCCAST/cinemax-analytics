@@ -29,6 +29,12 @@ models:
     calidad:
       +schema: calidad
       +materialized: table
+    semantic:
+      +schema: semantic
+      +materialized: view
+      +persist_docs:
+        relation: true
+        columns: true
     marts:
       +schema: marts
       +materialized: table

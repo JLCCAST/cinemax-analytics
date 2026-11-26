@@ -1,0 +1,122 @@
+version: 2
+
+# Lo único que ve el agente. Las descripciones quedan como COMMENT ON y el agente las lee.
+
+models:
+  - name: vw_ventas
+    description: Una fila por compra pagada. Para totales de dinero, ticket promedio (gasto por compra), medio de pago, promociones y clientes. Importes en soles.
+    columns:
+      - name: id_cliente
+        description: Id del cliente (-1 = desconocido). No hay nombres ni datos personales.
+      - name: fecha_venta
+        description: Fecha de la compra en hora de Lima.
+      - name: mes_venta
+        description: Mes de la compra como texto AAAA-MM.
+      - name: dia_venta
+        description: Día de la semana de la compra (Lunes a Domingo).
+      - name: temporada_venta
+        description: Verano, Vacaciones de medio año, Fin de año o Regular, según la fecha de compra.
+      - name: hora_venta
+        description: Hora del día de la compra (0 a 23).
+      - name: sede
+        description: Sede del cine, por ejemplo "CineMax Miraflores".
+      - name: pelicula
+        description: Título de la película comprada; nulo en un pedido solo de confitería.
+      - name: promocion
+        description: Promoción aplicada; "Sin promoción" si no hubo. Una sola por compra.
+      - name: metodo_pago
+        description: YAPE o TARJETA.
+      - name: solo_confiteria
+        description: Verdadero si la compra no tiene entradas, solo productos de confitería.
+      - name: n_entradas
+        description: Entradas compradas en esta compra.
+      - name: con_combo
+        description: La compra incluye al menos un combo.
+      - name: dias_anticipacion
+        description: Días entre la compra y la función.
+      - name: subtotal
+        description: Precio antes del descuento, en soles.
+      - name: descuento
+        description: Descuento de la promoción, en soles.
+      - name: total
+        description: Lo cobrado en soles (subtotal - descuento). Es el ingreso de la compra.
+      - name: rango_edad
+        description: Rango de edad del cliente.
+      - name: cohorte
+        description: Mes de la primera compra del cliente (AAAA-MM).
+
+  - name: vw_entradas
+    description: Una fila por entrada (butaca) vendida. Para contar entradas, tarifas, anticipación y semanas desde el estreno.
+    columns:
+      - name: fecha_funcion
+        description: Fecha de la función (no de la compra).
+      - name: mes_funcion
+        description: Mes de la función, AAAA-MM.
+      - name: dia_funcion
+        description: Día de la semana de la función.
+      - name: hora_funcion
+        description: Hora de inicio de la función (0 a 23).
+      - name: franja
+        description: Matiné (antes de las 15), Tarde, Noche o Trasnoche.
+      - name: fecha_venta
+        description: Fecha de la compra.
+      - name: mes_venta
+        description: Mes de la compra, AAAA-MM.
+      - name: tarifa
+        description: Adulto, Niño, Adulto mayor o Persona con discapacidad.
+      - name: precio_lista
+        description: Precio de la entrada según la tarifa, antes del descuento, en soles.
+      - name: ingreso_neto
+        description: Lo cobrado por la entrada después del descuento, en soles.
+      - name: semana_desde_estreno
+        description: Semanas desde el estreno de la película; 0 = semana del estreno, 2 = tercera semana.
+
+  - name: vw_ocupacion_funcion
+    description: Una fila por función, también las que no vendieron. Para ocupación y asistencia. Por defecto usar solo estado = 'Programada'.
+    columns:
+      - name: fecha_funcion
+        description: Fecha de la función.
+      - name: mes_funcion
+        description: Mes de la función, AAAA-MM.
+      - name: temporada
+        description: Verano, Vacaciones de medio año, Fin de año o Regular.
+      - name: estado
+        description: Programada o Cancelada.
+      - name: capacidad
+        description: Butacas de la sala.
+      - name: vendidas
+        description: Entradas vendidas para esa función.
+      - name: ocupacion
+        description: vendidas / capacidad de esa función (0 a 1). Para un grupo de funciones, la ocupación es sum(vendidas) / sum(capacidad).
+      - name: ingreso_entradas
+        description: Ingreso neto por entradas de la función, en soles.
+      - name: ingreso_confiteria
+        description: Confitería comprada junto con entradas de esta función, en soles.
+      - name: semana_desde_estreno
+        description: 0 = semana del estreno.
+
+  - name: vw_confiteria
+    description: Una fila por producto de confitería vendido.
+    columns:
+      - name: producto
+        description: Nombre del producto, por ejemplo "Canchita Grande" o "Combo Pareja".
+      - name: categoria
+        description: Bebidas, Combos, Dulces o Salados.
+      - name: cantidad
+        description: Unidades vendidas en la línea.
+      - name: importe_neto
+        description: Lo cobrado por la línea después del descuento, en soles.
+
+  - name: vw_ingresos_por_genero
+    description: Entradas e ingresos por género y mes de función. Las películas con varios géneros se reparten entre ellos, así que sumar por género no duplica.
+    columns:
+      - name: entradas
+        description: Entradas repartidas (puede tener decimales).
+      - name: ingreso_neto
+        description: Ingreso por entradas repartido, en soles.
+
+  - name: vw_peliculas
+    description: Catálogo de películas. Los títulos y directores son inventados.
+    columns:
+      - name: generos
+        description: Todos los géneros de la película, separados por coma.

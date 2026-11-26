@@ -1,0 +1,149 @@
+# Evaluación del agente: 25 preguntas con su SQL de referencia.
+# Se compara el resultado de la consulta del agente con el de la referencia, no el texto
+# del SQL. respondible: false = lo correcto es decir que no hay datos.
+# Ninguna se repite en los ejemplos del prompt (grafo.EJEMPLOS).
+
+- id: 1
+  dificultad: facil
+  pregunta: ¿Cuántas compras hubo en total?
+  sql: SELECT count(*) FROM semantic.vw_ventas
+
+- id: 2
+  dificultad: facil
+  pregunta: ¿Cuánto dinero se recaudó en total?
+  sql: SELECT sum(total) FROM semantic.vw_ventas
+
+- id: 3
+  dificultad: facil
+  pregunta: ¿Cuál es el ticket promedio por compra?
+  sql: SELECT avg(total) FROM semantic.vw_ventas
+
+- id: 4
+  dificultad: facil
+  pregunta: ¿Cuántas entradas se vendieron en marzo de 2026?
+  sql: SELECT count(*) FROM semantic.vw_entradas WHERE mes_venta = '2026-03'
+
+- id: 5
+  dificultad: facil
+  pregunta: ¿Qué sede recaudó más dinero?
+  sql: SELECT sede FROM semantic.vw_ventas GROUP BY sede ORDER BY sum(total) DESC LIMIT 1
+
+- id: 6
+  dificultad: facil
+  pregunta: ¿Qué porcentaje de las compras se pagó con Yape?
+  sql: SELECT 100.0 * avg((metodo_pago = 'YAPE')::int) FROM semantic.vw_ventas
+
+- id: 7
+  dificultad: facil
+  pregunta: ¿Cuántas películas se estrenaron en 2026?
+  sql: SELECT count(*) FROM semantic.vw_peliculas WHERE extract(year FROM fecha_estreno) = 2026
+
+- id: 8
+  dificultad: facil
+  pregunta: ¿Cuál es la ocupación general de las funciones?
+  sql: >
+    SELECT 100.0 * sum(vendidas) / sum(capacidad)
+    FROM semantic.vw_ocupacion_funcion WHERE estado = 'Programada'
+
+- id: 9
+  dificultad: facil
+  pregunta: ¿Cuántas funciones se cancelaron?
+  sql: SELECT count(*) FROM semantic.vw_ocupacion_funcion WHERE estado = 'Cancelada'
+
+- id: 10
+  dificultad: facil
+  pregunta: ¿Cuál es el producto de confitería que más unidades vendió?
+  sql: SELECT producto FROM semantic.vw_confiteria GROUP BY producto ORDER BY sum(cantidad) DESC LIMIT 1
+
+- id: 11
+  dificultad: media
+  pregunta: ¿Cuánto recaudó cada sede en 2026?
+  sql: >
+    SELECT sede, sum(total) FROM semantic.vw_ventas
+    WHERE fecha_venta >= '2026-01-01' AND fecha_venta < '2027-01-01' GROUP BY sede
+
+- id: 12
+  dificultad: media
+  pregunta: ¿Qué día de la semana tiene la ocupación más alta?
+  sql: >
+    SELECT dia_funcion FROM semantic.vw_ocupacion_funcion WHERE estado = 'Programada'
+    GROUP BY dia_funcion ORDER BY sum(vendidas)::numeric / sum(capacidad) DESC LIMIT 1
+
+- id: 13
+  dificultad: media
+  pregunta: ¿Qué película vendió más entradas en julio de 2026?
+  sql: >
+    SELECT pelicula FROM semantic.vw_entradas WHERE mes_venta = '2026-07'
+    GROUP BY pelicula ORDER BY count(*) DESC LIMIT 1
+
+- id: 14
+  dificultad: media
+  pregunta: ¿Qué porcentaje de las compras con entradas incluye un combo?
+  sql: SELECT 100.0 * avg(con_combo::int) FROM semantic.vw_ventas WHERE NOT solo_confiteria
+
+- id: 15
+  dificultad: media
+  pregunta: ¿Cuántas veces se aplicó cada promoción?
+  sql: >
+    SELECT promocion, count(*) FROM semantic.vw_ventas
+    WHERE promocion <> 'Sin promoción' GROUP BY promocion
+
+- id: 16
+  dificultad: media
+  pregunta: ¿Cuánto se cobra en promedio por entrada los martes y cuánto los sábados?
+  sql: >
+    SELECT dia_funcion, avg(ingreso_neto) FROM semantic.vw_entradas
+    WHERE dia_funcion IN ('Martes', 'Sábado') GROUP BY dia_funcion
+
+- id: 17
+  dificultad: media
+  pregunta: ¿Cuál es la ocupación en cada franja horaria?
+  sql: >
+    SELECT franja, 100.0 * sum(vendidas) / sum(capacidad) FROM semantic.vw_ocupacion_funcion
+    WHERE estado = 'Programada' GROUP BY franja
+
+- id: 18
+  dificultad: media
+  pregunta: ¿Cuántos clientes distintos compraron al menos una vez?
+  sql: SELECT count(DISTINCT id_cliente) FROM semantic.vw_ventas WHERE id_cliente <> -1
+
+- id: 19
+  dificultad: dificil
+  pregunta: ¿Cuántas entradas por función vende en promedio una película en su semana de estreno y en su tercera semana?
+  sql: >
+    SELECT semana_desde_estreno, avg(vendidas) FROM semantic.vw_ocupacion_funcion
+    WHERE estado = 'Programada' AND semana_desde_estreno IN (0, 2) GROUP BY semana_desde_estreno
+
+- id: 20
+  dificultad: dificil
+  pregunta: ¿Qué género generó más ingresos por entradas, si una película con varios géneros se reparte entre ellos?
+  sql: SELECT genero FROM semantic.vw_ingresos_por_genero GROUP BY genero ORDER BY sum(ingreso_neto) DESC LIMIT 1
+
+- id: 21
+  dificultad: dificil
+  pregunta: ¿Qué cohorte de clientes, según el mes de su primera compra, gasta más en promedio por cliente?
+  sql: >
+    SELECT cohorte FROM semantic.vw_ventas WHERE id_cliente <> -1
+    GROUP BY cohorte ORDER BY sum(total) / count(DISTINCT id_cliente) DESC LIMIT 1
+
+- id: 22
+  dificultad: dificil
+  pregunta: En la sede de Miraflores, ¿qué porcentaje de las compras del verano usó alguna promoción?
+  sql: >
+    SELECT 100.0 * avg((promocion <> 'Sin promoción')::int) FROM semantic.vw_ventas
+    WHERE sede = 'CineMax Miraflores' AND temporada_venta = 'Verano'
+
+- id: 23
+  dificultad: sin_datos
+  respondible: false
+  pregunta: ¿Cuánto stock de canchita había a fines de julio?
+
+- id: 24
+  dificultad: sin_datos
+  respondible: false
+  pregunta: ¿Cuál es el correo del cliente que más gastó?
+
+- id: 25
+  dificultad: sin_datos
+  respondible: false
+  pregunta: ¿Cuál fue la ganancia neta de CineMax después de costos en 2026?

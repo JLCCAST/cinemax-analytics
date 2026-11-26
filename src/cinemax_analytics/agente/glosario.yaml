@@ -1,0 +1,36 @@
+# Cómo se habla del negocio y qué significa en el warehouse. Va dentro del prompt.
+
+periodo_de_datos: >
+  Hay compras del 2025-11-01 al 2026-10-31 (hora de Lima). Hay funciones hasta
+  el 2026-11-10 porque algunas entradas se compran por adelantado.
+
+sinonimos:
+  sede: [cine, local, sucursal, complejo]
+  funcion: [sesión, horario, proyección]
+  pelicula: [film, filme, título]
+  confiteria: [dulcería, snacks, comida]
+  canchita: [pop corn, palomitas, popcorn]
+  compra: [venta, transacción, pedido, boleta]
+  entrada: [boleto, ticket, butaca vendida]
+  ingreso: [recaudación, ventas en soles, facturación]
+
+por_defecto:
+  - "Ventas, ingresos o entradas 'de un mes' se cuentan por fecha de compra (mes_venta)."
+  - "Ocupación, asistencia y funciones se cuentan por fecha de la función (fecha_funcion, mes_funcion)."
+  - "Ocupación y funciones: solo estado = 'Programada' salvo que pregunten por canceladas."
+  - "Ingresos: sumar total en vw_ventas (ya descuenta las promociones). Por entradas: ingreso_neto en vw_entradas."
+  - "Montos en soles (S/) con 2 decimales; porcentajes con 1 decimal."
+
+metricas:
+  ticket_promedio: "Gasto promedio por compra = avg(total) en vw_ventas. No confundir con número de entradas."
+  ocupacion: "sum(vendidas) / sum(capacidad) en vw_ocupacion_funcion (no promediar la columna ocupacion)."
+  entradas_por_funcion: "avg(vendidas) en vw_ocupacion_funcion con estado = 'Programada'."
+  tasa_de_combo: "Compras con con_combo / compras con entradas (solo_confiteria = false)."
+  semana_de_estreno: "semana_desde_estreno = 0 es la semana del estreno; la 'tercera semana' es 2."
+  ingresos_por_genero: "Usar vw_ingresos_por_genero, que reparte las películas con varios géneros."
+
+no_disponible:
+  - "Stock e inventario"
+  - "Costos, márgenes y ganancias"
+  - "Datos personales de clientes: nombres, correos, documentos, teléfonos"
+  - "Butacas o salas específicas por fila y número"

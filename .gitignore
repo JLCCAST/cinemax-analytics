@@ -15,3 +15,5 @@ logs/
 
 # Power BI: el archivo no se versiona, solo las capturas
 *.pbix
+
+agente_resultados/
