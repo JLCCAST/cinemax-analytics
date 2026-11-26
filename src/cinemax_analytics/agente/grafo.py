@@ -12,9 +12,9 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode, tools_condition
 
-from cinemax_analytics.agente.herramientas import HERRAMIENTAS
+from cinemax_analytics.agente.herramientas import HERRAMIENTAS, vistas_disponibles
 
-MODELO_POR_DEFECTO = "gemini-2.5-flash"
+MODELO_POR_DEFECTO = "gemini-3.1-flash-lite"
 PASOS_MAXIMOS = 25
 FRASE_SIN_DATOS = "No hay datos en el warehouse para responder eso"
 
@@ -37,14 +37,19 @@ def _glosario() -> str:
     )
 
 
-def prompt_del_sistema() -> str:
+def prompt_del_sistema(vistas: dict[str, str] | None = None) -> str:
+    lista = "\n".join(f"- semantic.{nombre}: {desc}" for nombre, desc in (vistas or {}).items())
     return f"""Eres analista de datos de CineMax, una cadena de cines en Perú. Respondes en español
 preguntas de negocio consultando un warehouse PostgreSQL. Los datos son sintéticos.
 
+Vistas disponibles (no existen otras):
+{lista or "Usa listar_vistas para verlas."}
+
 Cómo trabajar:
-1. Si no conoces las columnas, usa listar_vistas y describir_vista. Solo existen las vistas de semantic.
+1. Antes de escribir SQL sobre una vista, mira sus columnas con describir_vista.
 2. Si el usuario nombra una película, sede, producto o promoción, confirma cómo está escrito con buscar_valor.
-3. Escribe una consulta SELECT y córrela con ejecutar_sql. Si falla, corrígela.
+3. Escribe una consulta SELECT y córrela con ejecutar_sql. Si falla, corrígela. Si corres varias
+   consultas, la última que ejecutes debe ser la que respalda tu respuesta.
 4. Responde en una o dos frases con la cifra. Dinero en soles (S/), porcentajes con un decimal.
    No muestres el SQL salvo que te lo pidan.
 
@@ -65,7 +70,7 @@ def construir_agente(modelo: str | None = None):
         max_retries=6,
     )
     llm_con_herramientas = llm.bind_tools(HERRAMIENTAS)
-    sistema = SystemMessage(prompt_del_sistema())
+    sistema = SystemMessage(prompt_del_sistema(vistas_disponibles()))
 
     def pensar(estado: MessagesState):
         return {"messages": [llm_con_herramientas.invoke([sistema, *estado["messages"]])]}

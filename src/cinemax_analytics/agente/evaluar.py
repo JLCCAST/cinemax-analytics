@@ -17,7 +17,7 @@ import psycopg
 import yaml
 
 from cinemax_analytics.agente.comparar import coinciden
-from cinemax_analytics.agente.grafo import construir_agente, preguntar
+from cinemax_analytics.agente.grafo import MODELO_POR_DEFECTO, construir_agente, preguntar
 from cinemax_analytics.agente.herramientas import correr
 from cinemax_analytics.agente.seguridad import ConsultaRechazada
 from cinemax_analytics.fuentes import RAIZ
@@ -92,7 +92,7 @@ def main(argv: list[str] | None = None) -> int:
     respondibles = [d for d in detalle if d["dificultad"] != "sin_datos"]
     sin_datos = [d for d in detalle if d["dificultad"] == "sin_datos"]
     resumen = {
-        "modelo": os.getenv("AGENTE_MODELO", "gemini-2.5-flash"),
+        "modelo": os.getenv("AGENTE_MODELO", MODELO_POR_DEFECTO),
         "exactitud": sum(d["resultado"] == "ok" for d in respondibles) / max(1, len(respondibles)),
         "abstencion_correcta": sum(d["resultado"] == "abstencion_correcta" for d in sin_datos)
         / max(1, len(sin_datos)),

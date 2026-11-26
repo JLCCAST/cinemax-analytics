@@ -23,8 +23,13 @@ def test_redondeo_dentro_de_la_tolerancia():
     assert not coinciden([(41.83,)], [(43.0,)])
 
 
-def test_distinta_cantidad_de_filas():
-    assert not coinciden([("A",)], [("A",), ("B",)])
+def test_un_ranking_mas_largo_vale_si_el_primero_coincide():
+    assert coinciden([("A",)], [("A", 10), ("B", 5)])
+    assert not coinciden([("B",)], [("A", 10), ("B", 5)])
+
+
+def test_faltan_filas():
+    assert not coinciden([("A",), ("B",)], [("A",)])
 
 
 def test_texto_sin_tildes_ni_mayusculas():

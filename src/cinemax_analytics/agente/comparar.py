@@ -49,6 +49,16 @@ def _columnas_iguales(referencia: list, agente: list) -> bool:
 
 
 def coinciden(referencia: list[tuple], agente: list[tuple]) -> bool:
+    """Si la referencia es un "cuál es el que más" (pocas filas) y el agente trajo un ranking
+    más largo, valen sus primeras filas: se asume que vienen ordenadas."""
+    if len(agente) > len(referencia) and _coinciden_igual_largo(
+        referencia, agente[: len(referencia)]
+    ):
+        return True
+    return _coinciden_igual_largo(referencia, agente)
+
+
+def _coinciden_igual_largo(referencia: list[tuple], agente: list[tuple]) -> bool:
     if len(referencia) != len(agente):
         return False
     if not referencia:
